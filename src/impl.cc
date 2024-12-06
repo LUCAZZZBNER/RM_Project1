@@ -126,7 +126,7 @@ void sortByY(vector<cv::Point>& points) {
 }
 
 //找轮廓顶点
-//TODO: 待修改
+//TODO: 待优化
 Point findVertice(const vector<Point>& contour, Mat& img) {
     //cout<<contour.size()<<endl;
     Point vertice = contour[0];
@@ -259,6 +259,8 @@ void sortByAngle(vector<Point>& points, Point startPt) {
     }
 }
 
+//PnP解算
+//TODO: 待测试
 Mat PNP(const vector<Point>& face_Points) {
     vector<Point3f> objectPoints; 
     vector<Point2f> imagePoints; 

@@ -1,6 +1,5 @@
 #include "test.h"
 
-
 void test_Points(Mat src) {
     resize(src, src, Size(), 4, 4);
 
@@ -55,10 +54,7 @@ void test_Points(Mat src) {
         }
     }
 
-
-    //TODO: PNP
     Mat transformMatrix = PNP(face_Points);
-
 
     namedWindow("src", WINDOW_NORMAL);
     resizeWindow("src", 1600, 1000);
