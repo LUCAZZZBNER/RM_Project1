@@ -20,6 +20,6 @@ void distinguish_Special(vector<vector<Point>>& faceContours, vector<vector<Poin
 struct PointWithAngle { cv::Point pt;double angle; };
 bool comparewithAngle(const PointWithAngle& a, const PointWithAngle& b);
 void sortByAngle(vector<Point>& points, Point startPt);
-Mat PNP(const vector<Point>& face_Points);
+Mat PNP(const vector<Point>& face_Points, const Mat& src);
 
 #endif

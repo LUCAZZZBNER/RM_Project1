@@ -261,17 +261,17 @@ void sortByAngle(vector<Point>& points, Point startPt) {
 
 //PnP解算
 //TODO: 待测试
-Mat PNP(const vector<Point>& face_Points) {
-    vector<Point3f> objectPoints; 
+Mat PNP(const vector<Point>& face_Points, const Mat& src) {
+    vector<Point3f> objectPoints;
     vector<Point2f> imagePoints; 
 
     objectPoints.push_back(Point3f(0.0f, 0.0f, 0.0f));
-    objectPoints.push_back(Point3f(0.0f, -275.0f, 0.0f));
-    objectPoints.push_back(Point3f(-275.0f, -275.0f, 0.0f));
-    objectPoints.push_back(Point3f(-275.0f, 0.0f, 0.0f));
+    objectPoints.push_back(Point3f(275.0f, 0.0f, 0.0f));
+    objectPoints.push_back(Point3f(275.0f, 275.0f, 0.0f));
+    objectPoints.push_back(Point3f(0.0f, 275.0f, 0.0f));
 
     for (int i = 0; i < face_Points.size(); i++) {
-        imagePoints.push_back(Point2f(face_Points[i].x, face_Points[i].y));
+        imagePoints.push_back(face_Points[i]);
     }
     // 定义相机内参矩阵
     Mat cameraMatrix = (Mat_<double>(3, 3) << 1.521928836685752e+03, 0, 9.504930579948792e+02, 0, 1.521695508574793e+03, 6.220985582938733e+02, 0, 0, 1);
@@ -283,35 +283,13 @@ Mat PNP(const vector<Point>& face_Points) {
     bool success = solvePnP(objectPoints, imagePoints, cameraMatrix, distCoeffs, rvec, tvec);
 
     if (success) {
-        // 位姿解算成功，rvec和tvec包含了相机的旋转和平移信息
-
-        // 将旋转向量转换为旋转矩阵
-        Mat R;
-        Rodrigues(rvec, R); // R是3x3的旋转矩阵
-
-        // 构建4x4变换矩阵
-        Mat transformMatrix = Mat::eye(4, 4, R.type());
-        R.copyTo(transformMatrix(Rect(0, 0, 3, 3))); // 将旋转矩阵R复制到左上角
-        tvec.copyTo(transformMatrix(Rect(3, 0, 1, 3))); // 将平移向量tvec复制到右上角
-
-        // 打印旋转矩阵和平移向量
-        cout << "Rotation Matrix: " << R << endl;
-        cout << "Translation Vector: " << tvec << endl;
-
-        // 打印变换矩阵
-        cout << "Transformation Matrix: " << transformMatrix << endl;
-
-        // 使用变换矩阵将世界坐标系中的点转换到相机坐标系
-        Mat pointWorld = (Mat_<double>(4,1) << 1.0, 1.0, 1.0, 1.0); // 世界坐标系中的点（齐次坐标）
-        Mat pointCamera = transformMatrix * pointWorld; // 转换到相机坐标系
-        cout << "Point in Camera Coordinates: " << pointCamera.t() << endl;
-
-        return transformMatrix;
+        Mat pnp = src.clone();
+        drawFrameAxes(pnp, cameraMatrix, distCoeffs, rvec, tvec, 100, 2);
+        return pnp;
     }
     else {
         // 位姿解算失败
         cout << "Failed to solve PnP" << endl;
+        return Mat();
     }
-
-    return Mat();
 }

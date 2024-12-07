@@ -37,6 +37,10 @@ void test_Points(Mat src) {
             circle(dst, side_Points[p], 7, Scalar(255, 150, 20), -1);
             putText(dst, to_string(p), side_Points[p], FONT_HERSHEY_SIMPLEX, 3, Scalar(255, 150, 20), 2);
         }
+        for (int i = 0; i < 3; i++) {
+            side_Points[i].x = side_Points[i].x / 4;
+            side_Points[i].y = side_Points[i].y / 4;
+        }
     }
 
     //正面点标序
@@ -52,10 +56,18 @@ void test_Points(Mat src) {
             circle(dst, face_Points[p], 7, Scalar(255, 255, 0), -1);
             putText(dst, to_string(p), face_Points[p], FONT_HERSHEY_SIMPLEX, 3, Scalar(255, 255, 0), 2);
         }
+
+        for (int i = 0; i < 4; i++) {
+            face_Points[i].x = face_Points[i].x / 4;
+            face_Points[i].y = face_Points[i].y / 4;
+        }
     }
 
+    resize(src, src, Size(), 0.25, 0.25);
+
+    Mat pnp;
     if (face_Points.size() == 4) {
-        Mat transformMatrix = PNP(face_Points);
+        pnp = PNP(face_Points, src);
     }
 
     namedWindow("src", WINDOW_NORMAL);
@@ -66,11 +78,14 @@ void test_Points(Mat src) {
     resizeWindow("approx_Lines", 1600, 1000);
     namedWindow("vertex Points", WINDOW_NORMAL);
     resizeWindow("vertex Points", 1600, 1000);
-    
+    namedWindow("pnp", WINDOW_NORMAL);
+    resizeWindow("pnp", 1600, 1000);
+
     imshow("src", src);
     imshow("Red Lines", red_Lines);
     imshow("approx_Lines", approx_Lines);
     imshow("vertex Points", dst);
+    imshow("pnp", pnp);
     waitKey(0);
     destroyAllWindows();
 }   
