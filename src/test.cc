@@ -54,7 +54,9 @@ void test_Points(Mat src) {
         }
     }
 
-    Mat transformMatrix = PNP(face_Points);
+    if (face_Points.size() == 4) {
+        Mat transformMatrix = PNP(face_Points);
+    }
 
     namedWindow("src", WINDOW_NORMAL);
     resizeWindow("src", 1600, 1000);
