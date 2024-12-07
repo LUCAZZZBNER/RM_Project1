@@ -4,7 +4,7 @@
 int main() {
     while (1) {
         string relative_Path;
-        cout<<"\nPlease input the relative path of the image: "<<endl;
+        cout << "\nPlease input the relative path of the image: " << endl;
         cin >> relative_Path;
         if (relative_Path == "exit" || relative_Path == "0") {
             return 0;
