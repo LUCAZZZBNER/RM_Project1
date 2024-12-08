@@ -6,11 +6,11 @@ void test_Points(Mat src) {
     vector<vector<Point>> contours = get_Contours(src);
     vector<vector<Point>> approxs = get_Triangles(contours);
     
-    Mat red_Lines = src.clone();
-    drawContours(red_Lines, contours, -1, Scalar(0, 255, 0), 2);;
+    // Mat red_Lines = src.clone();
+    // drawContours(red_Lines, contours, -1, Scalar(0, 255, 0), 2);;
 
-    Mat approx_Lines = src.clone();
-    drawContours(approx_Lines, approxs, -1, Scalar(0, 255, 0), 2);
+    // Mat approx_Lines = src.clone();
+    // drawContours(approx_Lines, approxs, -1, Scalar(0, 255, 0), 2);
 
     Mat dst = src.clone();
     
@@ -22,8 +22,14 @@ void test_Points(Mat src) {
     vector<vector<Point>> specialContours;
     vector<vector<Point>> otherContours;
 
+    // for (int i = 0; i < approxs.size(); i++) {
+    //     cout << arcLength(approxs[i], true) << endl;
+    // }
+
     //区分正面和侧面
     distinguish_Faces(faceContours, sideContours, approxs);
+
+    //drawContours(dst, sideContours, -1, Scalar(255, 150, 20), 2);
 
     //侧面点标序
     if (sideContours.size() == 1) {
@@ -45,6 +51,8 @@ void test_Points(Mat src) {
 
     //正面点标序
     distinguish_Special(faceContours, specialContours, otherContours);
+
+    //drawContours(dst, faceContours, -1, Scalar(255, 255, 0), 2);
 
     if (specialContours.size() == 1 && otherContours.size() == 3) {
         face_Points.push_back(findVertice(specialContours[0], src));
@@ -69,23 +77,14 @@ void test_Points(Mat src) {
     if (face_Points.size() == 4) {
         pnp = PNP(face_Points, src);
     }
+    else {
+        pnp = src;
+    }
 
-    namedWindow("src", WINDOW_NORMAL);
-    resizeWindow("src", 1600, 1000);
-    namedWindow("Red Lines", WINDOW_NORMAL);
-    resizeWindow("Red Lines", 1600, 1000);
-    namedWindow("approx_Lines", WINDOW_NORMAL);
-    resizeWindow("approx_Lines", 1600, 1000);
-    namedWindow("vertex Points", WINDOW_NORMAL);
-    resizeWindow("vertex Points", 1600, 1000);
-    namedWindow("pnp", WINDOW_NORMAL);
-    resizeWindow("pnp", 1600, 1000);
 
-    imshow("src", src);
-    imshow("Red Lines", red_Lines);
-    imshow("approx_Lines", approx_Lines);
+    // imshow("src", src);
+    // imshow("Red Lines", red_Lines);
+    // imshow("approx_Lines", approx_Lines);
     imshow("vertex Points", dst);
     imshow("pnp", pnp);
-    waitKey(0);
-    destroyAllWindows();
 }   

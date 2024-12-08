@@ -101,7 +101,8 @@ void distinguish_Faces(vector<vector<Point>>& faceContours, vector<vector<Point>
     if (sec_Num == -1) {
         sideContours.push_back(approxs[max_Num]);
     }
-    else if (arcLength(approxs[max_Num], true) > arcLength(approxs[sec_Num], true) * 1.8) {
+    //TODO: 改倍数
+    else if (arcLength(approxs[max_Num], true) > arcLength(approxs[sec_Num], true) * 1.7) {
         sideContours.push_back(approxs[max_Num]);
         for (size_t i = 0; i < approxs.size(); i++) {
             if (i != max_Num) {
@@ -260,7 +261,6 @@ void sortByAngle(vector<Point>& points, Point startPt) {
 }
 
 //PnP解算
-//TODO: 待测试
 Mat PNP(const vector<Point>& face_Points, const Mat& src) {
     vector<Point3f> objectPoints;
     vector<Point2f> imagePoints; 
@@ -290,6 +290,6 @@ Mat PNP(const vector<Point>& face_Points, const Mat& src) {
     else {
         // 位姿解算失败
         cout << "Failed to solve PnP" << endl;
-        return Mat();
+        return src;
     }
 }
