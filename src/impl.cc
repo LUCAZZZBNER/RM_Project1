@@ -102,7 +102,7 @@ void distinguish_Faces(vector<vector<Point>>& faceContours, vector<vector<Point>
         sideContours.push_back(approxs[max_Num]);
     }
     //TODO: 改倍数
-    else if (arcLength(approxs[max_Num], true) > arcLength(approxs[sec_Num], true) * 1.7) {
+    else if (arcLength(approxs[max_Num], true) > arcLength(approxs[sec_Num], true) * 1.6) {
         sideContours.push_back(approxs[max_Num]);
         for (size_t i = 0; i < approxs.size(); i++) {
             if (i != max_Num) {
@@ -124,88 +124,6 @@ bool compareByY(const cv::Point& a, const cv::Point& b) {
 
 void sortByY(vector<cv::Point>& points) {
     sort(points.begin(), points.end(), compareByY);
-}
-
-//找轮廓顶点
-//TODO: 待优化
-Point findVertice(const vector<Point>& contour, Mat& img) {
-    //cout<<contour.size()<<endl;
-    Point vertice = contour[0];
-
-    if (contour.size() == 3) {
-        for (int j = 0; j < 3; j++) {
-            Point midPoint1 = (contour[j] + contour[(j + 1) % 3]) / 2;
-            //circle(img, midPoint1, 3, Scalar(0, 255, 0), -1);
-            Point midPoint2 = (contour[j] + contour[(j + 2) % 3]) / 2;
-            //circle(img, midPoint2, 3, Scalar(0, 255, 0), -1);
-            int a = isRedPixel(midPoint1, img);
-            int b = isRedPixel(midPoint2, img);
-
-            if (a && b) {
-                vertice = contour[j];
-                //cout << img.at<Vec3b>(midPoint1) << endl;
-                break;
-            }
-            else {
-                float r = 3;// 调整
-                Point midPoint1_1(midPoint1.x + r, midPoint1.y + r);
-                Point midPoint1_2(midPoint1.x - r, midPoint1.y - r);
-                Point midPoint1_3(midPoint1.x + r, midPoint1.y - r);
-                Point midPoint1_4(midPoint1.x - r, midPoint1.y + r);
-                Point midPoint2_1(midPoint2.x + r, midPoint2.y + r);
-                Point midPoint2_2(midPoint2.x - r, midPoint2.y - r);
-                Point midPoint2_3(midPoint2.x + r, midPoint2.y - r);
-                Point midPoint2_4(midPoint2.x - r, midPoint2.y + r);
-
-                int a1 = isRedPixel(midPoint1_1, img);
-                int a2 = isRedPixel(midPoint1_2, img);
-                int a3 = isRedPixel(midPoint1_3, img);
-                int a4 = isRedPixel(midPoint1_4, img);
-                int b1 = isRedPixel(midPoint2_1, img);
-                int b2 = isRedPixel(midPoint2_2, img);
-                int b3 = isRedPixel(midPoint2_3, img);
-                int b4 = isRedPixel(midPoint2_4, img);
-
-                if ((a1 || a2 || a3 || a4) && (b1 || b2 || b3 || b4)){
-                    vertice = contour[j];
-                }
-            }
-        }
-    }
-
-    // if (contour.size() == 3) {
-    //     double max = 0;
-    //     for (int j = 0; j < 3; j++) {
-    //         double angle1 = atan2(contour[(j + 1) % 3].y - contour[j].y, contour[(j + 1) % 3].x - contour[j].x);
-    //         double angle2 = atan2(contour[(j + 2) % 3].y - contour[j].y, contour[(j + 2) % 3].x - contour[j].x);
-    //         double angle = angle2 - angle1;
-    //         if (angle < 0)angle *= -1;
-    //         if (angle > M_PI)angle = 2 * M_PI - angle;
-    //         if (angle > max) {
-    //             max = angle;
-    //             vertice = contour[j];
-    //         }
-    //     }
-    // }
-
-    return vertice;
-}
-
-bool isRedPixel(Point point, Mat image) {
-    int x = point.x;
-    int y = point.y;
-    if (x < 0 || x >= image.cols || y < 0 || y >= image.rows || image.empty()) {
-        return false;
-    }
-
-    const Scalar redLower(0, 0, 50);
-    const Scalar redUpper(50, 50, 255);
-    //adjust
-
-    Vec3b color = image.at<Vec3b>(y, x);
-    return (color[0] >= redLower[0] && color[0] <= redUpper[0] &&
-            color[1] >= redLower[1] && color[1] <= redUpper[1] &&
-            color[2] >= redLower[2] && color[2] <= redUpper[2]);
 }
 
 //在面部轮廓中找特殊轮廓
@@ -258,6 +176,35 @@ void sortByAngle(vector<Point>& points, Point startPt) {
     for (const auto& pt : pointsWithAngles) {
         points.push_back(pt.pt);
     }
+}
+
+//找顶点
+void find_Vertices(vector<vector<Point>>& faceContours, vector<Point>& vertices) {
+    vector<vector<Point>> faceContours_copy = faceContours;
+    for (int i = 0;i < faceContours.size(); i++) {
+        for (size_t j = 0; j < vertices.size(); j++) {
+            if (pointPolygonTest(faceContours[i], vertices[j], false) == 0) {
+                faceContours_copy[j] = faceContours[i];
+            }
+        }
+    }
+    faceContours.clear();
+    for (size_t i = 0; i < faceContours_copy.size(); i++) {
+        faceContours.push_back(faceContours_copy[i]);
+    }
+
+    vector<Point> vertices_copy = vertices;
+    for (int i = 0;i < faceContours.size();i++) {
+        double max = 0;
+        for (int j = 0;j < faceContours[i].size();j++) {
+            vertices_copy[i] = faceContours[i][j];
+            if (contourArea(vertices_copy) >= max) {
+                max = contourArea(vertices_copy);
+                vertices[i] = faceContours[i][j];
+            }
+        }
+    }
+
 }
 
 //PnP解算

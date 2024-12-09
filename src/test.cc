@@ -29,7 +29,7 @@ void test_Points(Mat src) {
     //区分正面和侧面
     distinguish_Faces(faceContours, sideContours, approxs);
 
-    //drawContours(dst, sideContours, -1, Scalar(255, 150, 20), 2);
+    drawContours(dst, sideContours, -1, Scalar(255, 150, 20), 2);
 
     //侧面点标序
     if (sideContours.size() == 1) {
@@ -52,14 +52,18 @@ void test_Points(Mat src) {
     //正面点标序
     distinguish_Special(faceContours, specialContours, otherContours);
 
-    //drawContours(dst, faceContours, -1, Scalar(255, 255, 0), 2);
+    drawContours(dst, faceContours, -1, Scalar(255, 255, 0), 2);
 
+    faceContours.clear();
     if (specialContours.size() == 1 && otherContours.size() == 3) {
-        face_Points.push_back(findVertice(specialContours[0], src));
+        faceContours.push_back(specialContours[0]);
+        face_Points.push_back(specialContours[0][0]);
         for (int i = 0;i < otherContours.size();i++) {
-            face_Points.push_back(findVertice(otherContours[i], src));
+            faceContours.push_back(otherContours[i]);
+            face_Points.push_back(otherContours[i][0]);
         }
         sortByAngle(face_Points, face_Points[0]);
+        find_Vertices(faceContours, face_Points);
         for (int p = 0; p < face_Points.size(); p++) {
             circle(dst, face_Points[p], 7, Scalar(255, 255, 0), -1);
             putText(dst, to_string(p), face_Points[p], FONT_HERSHEY_SIMPLEX, 3, Scalar(255, 255, 0), 2);
