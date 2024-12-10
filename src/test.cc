@@ -1,6 +1,6 @@
 #include "test.h"
 
-void test_Points(Mat src) {
+Mat test_Points(Mat src) {
     resize(src, src, Size(), 4, 4);
 
     vector<vector<Point>> contours = get_Contours(src);
@@ -29,7 +29,7 @@ void test_Points(Mat src) {
     //区分正面和侧面
     distinguish_Faces(faceContours, sideContours, approxs);
 
-    drawContours(dst, sideContours, -1, Scalar(255, 150, 20), 2);
+    //drawContours(dst, sideContours, -1, Scalar(255, 150, 20), 2);
 
     //侧面点标序
     if (sideContours.size() == 1) {
@@ -52,7 +52,7 @@ void test_Points(Mat src) {
     //正面点标序
     distinguish_Special(faceContours, specialContours, otherContours);
 
-    drawContours(dst, faceContours, -1, Scalar(255, 255, 0), 2);
+    //drawContours(dst, faceContours, -1, Scalar(255, 255, 0), 2);
 
     faceContours.clear();
     if (specialContours.size() == 1 && otherContours.size() == 3) {
@@ -75,20 +75,22 @@ void test_Points(Mat src) {
         }
     }
 
-    resize(src, src, Size(), 0.25, 0.25);
+    //resize(src, src, Size(), 0.25, 0.25);
+    resize(dst, dst, Size(), 0.25, 0.25);
 
-    Mat pnp;
+    //Mat pnp;
     if (face_Points.size() == 4) {
-        pnp = PNP(face_Points, src);
+        dst = PNP(face_Points, dst);
     }
-    else {
-        pnp = src;
-    }
+    // else {
+    //     pnp = src;
+    // }
 
 
     // imshow("src", src);
     // imshow("Red Lines", red_Lines);
     // imshow("approx_Lines", approx_Lines);
-    imshow("vertex Points", dst);
-    imshow("pnp", pnp);
+    //imshow("vertex Points", dst);
+    //imshow("pnp", pnp);
+    return dst;
 }   
